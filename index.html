@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratne Real Estate Group - Premium Secured CRM</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #0f766e;
+            --accent: #0284c7;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --danger: #e11d48;
+            --warning: #d97706;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #334155;
+            --border-color: #cbd5e1;
+        }
+        body.theme-emerald { --primary: #064e3b; --secondary: #059669; --accent: #10b981; --bg-body: #f0fdf4; --dark: #022c22; --border-color: #a7f3d0; }
+        body.theme-rosegold { --primary: #4c0519; --secondary: #be123c; --accent: #db2777; --bg-body: #fff1f2; --dark: #270510; --border-color: #fecdd3; }
+        body.theme-onyx { --primary: #111827; --secondary: #4b5563; --accent: #6366f1; --dark: #f9fafb; --light: #1f2937; --bg-body: #030712; --bg-card: #111827; --text-main: #f3f4f6; --border-color: #374151; }
+
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); transition: background 0.3s, color 0.3s; }
+
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e293b; display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .login-box { background: white; padding: 2.5rem; border-radius: 12px; width: 100%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); color: #333; }
+        .login-box h2 { text-align: center; color: #1e293b; font-size: 1.8rem; margin-top: 0; margin-bottom: 2rem; border: none; padding:0; }
+        .login-box label { font-weight: bold; color: #444; margin-bottom: 0.5rem; display: block; font-size: 0.95rem; }
+        .password-container { position: relative; display: flex; align-items: center; width: 100%; }
+        .password-container input { padding-right: 3.5rem !important; margin-bottom: 0 !important; }
+        .toggle-password-btn { position: absolute; right: 10px; background: transparent; border: none; color: #64748b; font-size: 0.85rem; font-weight: bold; cursor: pointer; width: auto !important; padding: 5px !important; }
+        .login-box input, .login-box select { width: 100%; padding: 0.85rem; border: 2px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; margin-bottom: 1.5rem; background: #fff; color: #333; }
+        .login-box .btn-submit-auth { background-color: #18bc9c; color: white; border: none; padding: 1rem; font-size: 1.2rem; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; }
+        .login-status { text-align: center; margin-top: 1rem; font-size: 0.9rem; color: #64748b; min-height: 20px; }
+        .login-status.error { color: #e11d48; font-weight: bold; }
+
+        header { background-color: var(--primary); color: white; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header-controls { display: flex; gap: 1.2rem; align-items: center; }
+        .sys-select { background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.25); padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .sys-select option { color: #333; }
+        .btn-logout { background-color: var(--danger); padding: 0.5rem 1.2rem; border-radius: 20px; width: auto; font-size: 0.9rem; cursor: pointer; color: white; font-weight: bold; border: none; }
+
+        .container { max-width: 1500px; margin: 2rem auto; padding: 0 1rem; }
+        .grid { display: grid; grid-template-columns: 440px 1fr; gap: 2rem; }
+        @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
+
+        .card { background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); height: fit-content; border: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .card.edit-highlight { border: 2px solid var(--accent); background-color: rgba(2,132,199,0.02); }
+        h2, h4 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--light); padding-bottom: 12px; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+        input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); border-radius: 6px; box-sizing: border-box; }
+        .inline-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        button { color: white; border: none; padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
+        .btn-primary { background-color: var(--secondary); }
+        .btn-accent { background-color: var(--accent); }
+        .btn-owner { background-color: var(--accent); }
+        .btn-neutral { background-color: #64748b; }
+
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 2px solid var(--light); }
+        .tab-btn { background: #e2e8f0; color: #334155; border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-weight: bold; border-top-left-radius: 6px; border-top-right-radius: 6px; }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        th { background-color: var(--primary); color: white; }
+        .clickable-row { cursor: pointer; }
+        .clickable-row:hover { background-color: rgba(0,0,0,0.02); }
+
+        .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        .badge-active { background-color: #d1fae5; color: #065f46; }
+        .badge-expired { background-color: #ffe4e6; color: #9f1239; }
+        .badge-available { background-color: #d1fae5; color: #065f46; }
+        .badge-pending { background-color: #fef3c7; color: #92400e; }
+        .badge-sold { background-color: #ffe4e6; color: #9f1239; }
+
+        .thumbnail-preview { width: 60px; height: 45px; object-fit: cover; border-radius: 4px; }
+        .action-btns { display: flex; gap: 0.5rem; }
+        .btn-action { padding: 0.4rem 0.8rem; font-size: 0.85rem; width: auto; }
+        .btn-edit { background-color: var(--accent); }
+        .btn-delete { background-color: var(--danger); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.9); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 900px; border-radius: 12px; color: var(--text-main); overflow: hidden; }
+        .modal-overlay h3, .modal-overlay h4 { border-bottom: none; padding-bottom: 0; }
+        .modal-header { background: var(--primary); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .close-modal { font-size: 2rem; color: white; cursor: pointer; background: transparent; border: none; width: auto; }
+        .modal-body { padding: 2rem; }
+        .media-showcase { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        .gallery-container { text-align: center; background: #000; border-radius: 8px; padding: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; }
+        .gallery-main { max-width: 100%; max-height: 400px; object-fit: contain; }
+        .video-container video { width: 100%; max-height: 400px; border-radius: 8px; background: #000; }
+        .media-thumbnails { display: flex; gap: 0.5rem; overflow-x: auto; margin-top: 10px; }
+        .thumb-nav { width: 80px; height: 60px; object-fit: cover; border-radius: 4px; cursor: pointer; opacity: 0.6; border: 2px solid transparent; }
+        .thumb-nav.active { opacity: 1; border-color: var(--accent); }
+        .info-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; border-top: 2px solid var(--border-color); padding-top: 1.5rem; }
+
+        /* Owner agent management styles */
+        .sheet-note { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: #166534; }
+    </style>
+</head>
+<body>
+
+    <div id="loginGateway" class="login-overlay">
+        <div class="login-box">
+            <h2>🔑 Agent Portal Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Agent Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required
+                        autocapitalize="none" autocorrect="off" autocomplete="username" spellcheck="false">
+                </div>
+                <div class="form-group">
+                    <label>Security Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" placeholder="••••" required
+                            autocomplete="current-password" autocorrect="off" spellcheck="false">
+                        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password')">SHOW</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit-auth" style="margin-top: 1.5rem;" id="loginBtn">Access Secure Dashboard</button>
+                <div class="login-status" id="loginStatus"></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="appDashboard" style="display: none;">
+        <header>
+            <h1 style="margin:0; font-size:1.5rem;">Ratne Real Estate Group (RREG)</h1>
+            <div class="header-controls">
+                <div id="headerHelplineDisplay" style="color: #67e8f9; font-weight: bold; font-size: 0.95rem; margin-right: 10px; display: none;"></div>
+                <div>
+                    <select id="themeSelector" class="sys-select" onchange="changeTheme(this.value)">
+                        <option value="default">Corporate Indigo Theme</option>
+                        <option value="emerald">Premium Luxury Emerald</option>
+                        <option value="rosegold">Rose Gold & Champagne</option>
+                        <option value="onyx">Deep Onyx Midnight</option>
+                    </select>
+                </div>
+                <div style="font-weight: bold; font-size: 0.95rem;">👤 Role: <span id="sessionLabel" style="color:#18bc9c">None</span></div>
+                <button class="btn-logout" onclick="executeLogout()">Sign Out</button>
+            </div>
+        </header>
+        <div class="container">
+            <div id="portalContentRouter"></div>
+        </div>
+    </div>
+
+    <div id="customerModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 style="margin:0;">Presentation View Mode</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="media-showcase">
+                    <div>
+                        <h4 style="margin-top:0;">📷 Image Gallery</h4>
+                        <div class="gallery-container"><img id="galleryViewer" src="" class="gallery-main" alt="No media"></div>
+                        <div class="media-thumbnails" id="imageThumbs"></div>
+                    </div>
+                    <div id="modalVideoSection">
+                        <h4>🎥 Video Tours</h4>
+                        <div class="media-thumbnails" id="videoThumbs"></div>
+                        <div class="video-container" id="videoPlayerBox" style="margin-top:10px; display:none;"><video id="videoViewer" controls></video></div>
+                    </div>
+                </div>
+                <div class="info-grid">
+                    <div>
+                        <h3 id="modalTitle" style="margin:0; color:var(--primary);"></h3>
+                        <p id="modalAddress" style="color: #64748b; margin:5px 0;"></p>
+                        <p id="modalDoc" style="font-size:0.85rem; margin-top:15px;">📄 <b>Internal Doc:</b> <span></span></p>
+                        <p id="modalHelpline" style="font-size:1rem; margin-top:10px; font-weight:bold; color:var(--accent);"></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="badge" id="modalStatus"></span>
+                        <p id="modalPrice" style="font-size: 1.8rem; font-weight:bold; color:var(--secondary); margin:5px 0;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======= GOOGLE SHEETS API URL =======
+        const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw2IlSvl9yHbC5W1ePJhzKzDoUr8pwCo4H2OuzRZI_h-av3Fr6aW8UjwRMETS-ZvI6qqg/exec";
+
+        let currentTab = 'Rent';
+        let currentUserKey = null;
+        let currentUserRole = null;
+        let currentUserData = null;
+        let allAccounts = [];
+        let propertyMediaBlobs = {};
+
+        // ======= FETCH ACCOUNTS VIA MODERN SECURE FETCH FOR MOBILE =======
+        async function fetchAccountsFromSheet() {
+            try {
+                const response = await fetch(SHEET_API_URL, { method: "GET" });
+                if (!response.ok) throw new Error("Network status not OK");
+                const data = await response.json();
+                allAccounts = data;
+                return data;
+            } catch (error) {
+                console.error("Mobile database access blocked:", error);
+                return [];
+            }
+        }
+
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = field.nextElementSibling;
+            if (field.type === "password") {
+                field.type = "text"; button.innerText = "HIDE";
+            } else {
+                field.type = "password"; button.innerText = "SHOW";
+            }
+        }
+
+        // ======= LOGIN =======
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim().toLowerCase();
+            const pass = document.getElementById('password').value.trim();
+            const statusEl = document.getElementById('loginStatus');
+            const loginBtn = document.getElementById('loginBtn');
+
+            statusEl.className = 'login-status';
+            statusEl.innerText = '⏳ Verifying credentials...';
+            loginBtn.disabled = true;
+            loginBtn.innerText = 'Please wait...';
+
+            const accounts = await fetchAccountsFromSheet();
+
+            if (accounts.length === 0) {
+                statusEl.className = 'login-status error';
+                statusEl.innerText = '❌ Cannot connect to database. Check internet connection.';
+                loginBtn.disabled = false;
+                loginBtn.innerText = 'Access Secure Dashboard';
+                return;
+            }
+
+            const account = accounts.find(a => 
+                String(a.username).trim().toLowerCase() === user && 
+                String(a.password).trim() === pass
+            );
+
+            if (account) {
+                statusEl.innerText = '';
+                document.getElementById('loginForm').reset();
+                processSessionVerification(user, account);
+            } else {
+                statusEl.className = 'login-status error';
+                statusEl.innerText = '❌ Authentication Rejected: Incorrect credentials.';
+                loginBtn.disabled = false;
+                loginBtn.innerText = 'Access Secure Dashboard';
+            }
+        });
+
+        // ======= SESSION VERIFICATION =======
+        function processSessionVerification(username, accountObj) {
+            if (String(accountObj.role).trim().toLowerCase() === 'owner') {
+                mountUserWorkspace(username, 'owner', accountObj);
+                return;
+            }
+
+            const todayMidnight = new Date(); todayMidnight.setHours(0,0,0,0);
+            const toDateObj = new Date(accountObj.toDate); toDateObj.setHours(0,0,0,0);
+            const timeDifference = todayMidnight.getTime() - toDateObj.getTime();
+
+            if (timeDifference <= 0) {
+                mountUserWorkspace(username, 'agent', accountObj);
+            } else {
+                const phone = accountObj.helpline || "[No Number Set]";
+                alert(`Your Subscription has ended. Please contact your Support Agent: ${phone}`);
+                executeLogout();
+            }
+        }
+
+        function mountUserWorkspace(username, role, accountObj) {
+            currentUserKey = username;
+            currentUserRole = role;
+            currentUserData = accountObj;
+
+            document.getElementById('loginGateway').style.display = "none";
+            document.getElementById('appDashboard').style.display = "block";
+            document.getElementById('sessionLabel').innerText = accountObj.name || username;
+
+            const helplineDisplay = document.getElementById('headerHelplineDisplay');
+            if (role === 'agent' && accountObj.helpline) {
+                helplineDisplay.innerText = `📞 Helpline: ${accountObj.helpline}`;
+                helplineDisplay.style.display = "block";
+            } else {
+                helplineDisplay.style.display = "none";
+            }
+
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = false;
+            loginBtn.innerText = 'Access Secure Dashboard';
+
+            renderRoutedLayout();
+        }
+
+        function executeLogout() {
+            currentUserKey = null; currentUserRole = null; currentUserData = null;
+            document.getElementById('appDashboard').style.display = "none";
+            document.getElementById('loginGateway').style.display = "flex";
+            document.getElementById('loginStatus').innerText = '';
+        }
+
+        // ======= LAYOUT RENDERING =======
+        function renderRoutedLayout() {
+            const viewRouter = document.getElementById('portalContentRouter');
+
+            if (currentUserRole === 'owner') {
+                viewRouter.innerHTML = `
+                    <div class="card">
+                        <h2>👥 Agent Management</h2>
+                        <div class="sheet-note">
+                            ✅ <b>Agents are now managed via Google Sheets.</b><br>
+                            To add, edit or remove agents — open your <b>RREG Portal Database</b> Google Sheet and update the rows directly.<br>
+                            Changes will reflect on <b>all devices instantly</b> when agents login next time.
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Agent Name</th>
+                                        <th>Username</th>
+                                        <th>Helpline</th>
+                                        <th>Access Status</th>
+                                        <th>Access Period</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="registeredAgentsRows"></tbody>
+                            </table>
+                        </div>
+                        <button class="btn-accent" style="margin-top:1.5rem; max-width:200px;" onclick="refreshAgentList()">🔄 Refresh List</button>
+                    </div>
+                `;
+                populateOwnerStaffDirectory();
+            } else {
+                viewRouter.innerHTML = `
+                    <div class="grid">
+                        <div class="card" id="formCard">
+                            <h2 id="formTitle">Add New Property</h2>
+                            <form id="propertyForm" onsubmit="executeInventorySubmission(event)">
+                                <input type="hidden" id="propertyId">
+                                <div class="form-group">
+                                    <label>Listing Purpose</label>
+                                    <select id="purpose" onchange="togglePriceLabels(this.value)">
+                                        <option value="Rent">For Rent</option>
+                                        <option value="Selling">For Selling</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Property Name</label>
+                                    <input type="text" id="title" placeholder="e.g., Luxury 3BHK Apartment" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <textarea id="address" rows="2" placeholder="Full address" required></textarea>
+                                </div>
+                                <div class="inline-group">
+                                    <div class="form-group">
+                                        <label id="priceLabel">Rent per Month (₹)</label>
+                                        <input type="number" id="price" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <select id="status">
+                                            <option value="Available">Available</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Sold">Sold / Rented</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label>Upload Images</label><input type="file" id="images" accept="image/*" multiple></div>
+                                <div class="form-group"><label>Upload Videos</label><input type="file" id="videos" accept="video/*" multiple></div>
+                                <div class="form-group"><label>Documents / Contracts</label><input type="file" id="document"></div>
+                                <button type="submit" id="submitBtn" class="btn-primary">Save Property</button>
+                                <button type="button" id="cancelEditBtn" style="display: none;" onclick="resetForm()">Cancel Edit</button>
+                            </form>
+                        </div>
+                        <div>
+                            <div class="tabs">
+                                <button class="tab-btn active" id="tabRent" onclick="switchTab('Rent')">Rent Directory</button>
+                                <button class="tab-btn" id="tabSelling" onclick="switchTab('Selling')">Sale Directory</button>
+                            </div>
+                            <div class="card">
+                                <h2 id="directoryTitle">Properties For Rent</h2>
+                                <div style="overflow-x: auto;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Preview</th>
+                                                <th>Property Details</th>
+                                                <th>Price</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inventoryRows"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                displayInventory();
+            }
+        }
+
+        // ======= OWNER AGENT DIRECTORY =======
+        async function refreshAgentList() {
+            allAccounts = await fetchAccountsFromSheet();
+            populateOwnerStaffDirectory();
+        }
+
+        function populateOwnerStaffDirectory() {
+            const tbody = document.getElementById('registeredAgentsRows');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            const todayMidnight = new Date(); todayMidnight.setHours(0,0,0,0);
+
+            const agents = allAccounts.filter(a => String(a.role).trim().toLowerCase() === 'agent');
+
+            if (agents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem;">No agents found in Google Sheet.</td></tr>`;
+                return;
+            }
+
+            agents.forEach(agent => {
+                const toDateObj = new Date(agent.toDate); toDateObj.setHours(0,0,0,0);
+                const isExpired = todayMidnight.getTime() > toDateObj.getTime();
+                const stateBadge = isExpired
+                    ? `<span class="badge badge-expired">Expired</span>`
+                    : `<span class="badge badge-active">Active</span>`;
+
+                const fDate = agent.fromDate ? new Date(agent.fromDate).toLocaleDateString() : 'N/A';
+                const tDate = agent.toDate ? new Date(agent.toDate).toLocaleDateString() : 'N/A';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><b>${agent.name || ''}</b></td>
+                    <td><code>${agent.username || ''}</code></td>
+                    <td><b>${agent.helpline || 'Not Set'}</b></td>
+                    <td>${stateBadge}</td>
+                    <td><small><b>From:</b> ${fDate}<br><b>To:</b> ${tDate}</small></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ======= AGENT INVENTORY =======
+        function togglePriceLabels(val) {
+            document.getElementById('priceLabel').innerText = val === 'Rent' ? 'Rent per Month (₹)' : 'Price (₹)';
+        }
+
+        function executeInventorySubmission(e) {
+            e.preventDefault();
+            const idField = document.getElementById('propertyId').value;
+            const purpose = document.getElementById('purpose').value;
+            const title = document.getElementById('title').value;
+            const address = document.getElementById('address').value;
+            const price = document.getElementById('price').value;
+            const status = document.getElementById('status').value;
+
+            let id = idField ? Number(idField) : Date.now();
+            let imgUrls = Array.from(document.getElementById('images').files).map(file => URL.createObjectURL(file));
+            let videoUrls = Array.from(document.getElementById('videos').files).map(file => URL.createObjectURL(file));
+            let docName = document.getElementById('document').files.length > 0 ? document.getElementById('document').files[0].name : "No Document";
+
+            let properties = localStorage.getItem('secure_crm_data_v5') ? JSON.parse(localStorage.getItem('secure_crm_data_v5')) : [];
+
+            if (idField) {
+                const index = properties.findIndex(p => p.id == id);
+                if (index !== -1 && properties[index].agentOwner === currentUserKey) {
+                    properties[index].purpose = purpose; properties[index].title = title;
+                    properties[index].address = address; properties[index].price = price; properties[index].status = status;
+                    if (document.getElementById('document').files.length > 0) properties[index].documentName = docName;
+                    if (imgUrls.length > 0) propertyMediaBlobs[id].images = imgUrls;
+                    if (videoUrls.length > 0) propertyMediaBlobs[id].videos = videoUrls;
+                }
+            } else {
+                properties.push({ id, agentOwner: currentUserKey, purpose, title, address, price, status, documentName: docName });
+                propertyMediaBlobs[id] = { images: imgUrls, videos: videoUrls };
+            }
+
+            localStorage.setItem('secure_crm_data_v5', JSON.stringify(properties));
+            switchTab(purpose); resetForm();
+        }
+
+        function displayInventory() {
+            const tbody = document.getElementById('inventoryRows'); if(!tbody) return; tbody.innerHTML = '';
+            let properties = localStorage.getItem('secure_crm_data_v5') ? JSON.parse(localStorage.getItem('secure_crm_data_v5')) : [];
+            let filtered = properties.filter(p => p.purpose === currentTab && p.agentOwner === currentUserKey);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No properties listed under your profile workspace.</td></tr>`; return;
+            }
+
+            filtered.forEach(prop => {
+                let statusClass = 'badge-available';
+                if (prop.status === 'Sold') statusClass = 'badge-sold';
+                if (prop.status === 'Pending') statusClass = 'badge-pending';
+
+                let firstImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='45'><rect width='60' height='45' fill='%23ccc'/></svg>";
+                if (propertyMediaBlobs[prop.id] && propertyMediaBlobs[prop.id].images.length > 0) firstImg = propertyMediaBlobs[prop.id].images[0];
+
+                const row = document.createElement('tr');
+                row.className = "clickable-row"; row.setAttribute('onclick', `openModal(${prop.id})`);
+                row.innerHTML = `
+                    <td><img src="${firstImg}" class="thumbnail-preview"></td>
+                    <td><b>${prop.title}</b><br><small>📍 ${prop.address}</small></td>
+                    <td><strong>₹${Number(prop.price).toLocaleString()}</strong>${prop.purpose === 'Rent' ? '/mo' : ''}</td>
+                    <td><span class="badge ${statusClass}">${prop.status}</span></td>
+                    <td onclick="event.stopPropagation()">
+                        <div class="action-btns">
+                            <button class="btn-action btn-edit" onclick="startEdit(${prop.id})">Edit</button>
+                            <button class="btn-action btn-delete" onclick="deleteInventory(${prop.id})">Delete</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openModal(id) {
+            let properties = JSON.parse(localStorage.getItem('secure_crm_data_v5'));
+            const prop = properties.find(p => p.id === id);
+            if (!prop || prop.agentOwner !== currentUserKey) return;
+
+            document.getElementById('modalTitle').innerText = prop.title;
+            document.getElementById('modalAddress').innerText = "📍 " + prop.address;
+            document.getElementById('modalPrice').innerText = `₹${Number(prop.price).toLocaleString()}${prop.purpose === 'Rent' ? '/mo' : ''}`;
+            document.getElementById('modalDoc').querySelector('span').innerText = prop.documentName;
+            document.getElementById('modalStatus').innerText = prop.status;
+            document.getElementById('modalStatus').className = `badge badge-${prop.status.toLowerCase()}`;
+            document.getElementById('modalHelpline').innerText = currentUserData && currentUserData.helpline ? `📞 Call Helpline: ${currentUserData.helpline}` : '';
+
+            const imgViewer = document.getElementById('galleryViewer');
+            const thumbContainer = document.getElementById('imageThumbs'); thumbContainer.innerHTML = '';
+            let media = propertyMediaBlobs[id] || { images: [], videos: [] };
+
+            if (media.images.length > 0) {
+                imgViewer.src = media.images[0];
+                media.images.forEach((imgUrl, idx) => {
+                    let thumb = document.createElement('img'); thumb.src = imgUrl;
+                    thumb.className = `thumb-nav ${idx === 0 ? 'active' : ''}`;
+                    thumb.onclick = function() {
+                        document.querySelectorAll('#imageThumbs .thumb-nav').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active'); imgViewer.src = imgUrl;
+                    };
+                    thumbContainer.appendChild(thumb);
+                });
+            } else { imgViewer.src = ""; imgViewer.alt = "No images uploaded"; }
+
+            const videoContainer = document.getElementById('videoThumbs');
+            const playerBox = document.getElementById('videoPlayerBox');
+            videoContainer.innerHTML = ''; playerBox.style.display = "none";
+
+            if (media.videos.length > 0) {
+                media.videos.forEach((videoUrl, idx) => {
+                    let btn = document.createElement('button'); btn.innerText = `▶ Play Tour ${idx + 1}`;
+                    btn.style.cssText = "background:var(--primary); padding:6px 12px; font-size:0.8rem; width:auto; margin-right:5px; border-radius:4px; color:white; border:none; cursor:pointer;";
+                    btn.onclick = function() {
+                        playerBox.style.display = "block";
+                        document.getElementById('videoViewer').src = videoUrl; document.getElementById('videoViewer').play();
+                    };
+                    videoContainer.appendChild(btn);
+                });
+            } else { videoContainer.innerHTML = "<span style='font-size:0.85rem; color:#64748b;'>No video tour uploaded.</span>"; }
+
+            document.getElementById('customerModal').style.display = "flex";
+        }
+
+        function closeModal() { document.getElementById('videoViewer').pause(); document.getElementById('customerModal').style.display = "none"; }
+
+        function startEdit(id) {
+            let properties = JSON.parse(localStorage.getItem('secure_crm_data_v5'));
+            const prop = properties.find(p => p.id === id);
+            if (!prop || prop.agentOwner !== currentUserKey) return;
+
+            document.getElementById('formCard').classList.add('edit-highlight');
+            document.getElementById('formTitle').innerText = "✏️ Edit Inventory Listing";
+            document.getElementById('submitBtn').innerText = "Apply Changes"; document.getElementById('submitBtn').className = "btn-accent";
+            document.getElementById('cancelEditBtn').style.display = "block";
+
+            document.getElementById('propertyId').value = prop.id; document.getElementById('purpose').value = prop.purpose;
+            document.getElementById('title').value = prop.title; document.getElementById('address').value = prop.address;
+            document.getElementById('price').value = prop.price; document.getElementById('status').value = prop.status;
+            togglePriceLabels(prop.purpose); window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('propertyForm').reset(); document.getElementById('propertyId').value = '';
+            document.getElementById('formCard').classList.remove('edit-highlight');
+            document.getElementById('formTitle').innerText = "Add New Property";
+            document.getElementById('submitBtn').innerText = "Save Property"; document.getElementById('submitBtn').className = "btn-primary";
+            document.getElementById('cancelEditBtn').style.display = "none"; togglePriceLabels('Rent');
+        }
+
+        function deleteInventory(id) {
+            if (confirm("Permanently drop listing from database?")) {
+                let properties = JSON.parse(localStorage.getItem('secure_crm_data_v5'));
+                properties = properties.filter(p => p.id !== id); localStorage.setItem('secure_crm_data_v5', JSON.stringify(properties));
+                delete propertyMediaBlobs[id]; displayInventory(); if (document.getElementById('propertyId').value == id) resetForm();
+            }
+        }
+
+        function switchTab(p) {
+            currentTab = p;
+            document.getElementById('tabRent').classList.toggle('active', p === 'Rent');
+            document.getElementById('tabSelling').classList.toggle('active', p === 'Selling');
+            document.getElementById('directoryTitle').innerText = p === 'Rent' ? 'Properties For Rent' : 'Properties For Sale';
+            displayInventory();
+        }
+
+        function changeTheme(themeName) {
+            document.body.className = ''; if (themeName !== 'default') document.body.classList.add('theme-' + themeName);
+        }
+    </script>
+</body>
+</html>
